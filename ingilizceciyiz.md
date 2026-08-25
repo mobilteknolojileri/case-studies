@@ -72,7 +72,7 @@ flowchart TD
 
 **CI enforces what review would otherwise have to catch.** GitHub Actions runs lint, typecheck and build, deploys edge functions, and runs `gitleaks` for secret scanning alongside a dependency audit. A Husky pre-push hook applies the same rules locally through Turborepo, so failures arrive before the push rather than after it.
 
-**Backups are a feature, not a runbook step.** A dedicated edge function exports the full database, and the admin panel downloads it in one click. Whatever the hosting platform provides by default is a floor, not a plan.
+**Backups are a feature, not a runbook step.** A dedicated edge function verifies the caller is an admin, dumps a whitelist of tables — user-generated documents deliberately excluded — and writes an audit entry attributed to the person who ran it, not to the service role. The admin panel downloads the result in one click. Whatever the hosting platform gives you by default is a floor, not a plan.
 
 **Delivery is deliberately boring.** Web deploys to Cloudflare Pages on push to `main`. Mobile builds through EAS, and JavaScript-only fixes ship as over-the-air updates without waiting for store review — which matters when a teacher hits a bug during a lesson.
 
@@ -105,7 +105,7 @@ flowchart TD
 ## Outcome
 
 - **11,277 documents generated** by **1,134 teachers** as of 26 August 2026 — roughly ten each
-- **1,069 document templates** across eight categories — the catalogue tracks the syllabus, and 444 daily plans were retired in 2026 after a curriculum update
+- **1,069 document templates** built across eight categories
 - **23,000+ downloads** — 13,594 on the App Store, 10,000+ on Google Play
 - **In the stores since September 2023**, across three back-to-school cycles; the rebuilt platform shipped in April 2026
 - **[PageSpeed Insights](https://pagespeed.web.dev/analysis?url=https://ingilizceciyizmobil.com/) 100 / 100 / 100 / 100 on mobile** — performance, accessibility, best practices and SEO, measured 26 August 2026, with LCP at 1.4 s, TBT at 0 ms and CLS at 0 on an emulated Moto G Power over throttled 4G
