@@ -84,8 +84,6 @@ flowchart TD
 
 <sub>Left to right: the 42 weeks of a yearly plan · a single week with its unit, outcomes, tasks and assessment · the teacher's own timetable.</sub>
 
-<!-- optional: architecture diagram → assets/ingilizceciyiz/architecture.webp -->
-
 ## Stack
 
 | Layer | Choice | Why |
@@ -113,3 +111,11 @@ flowchart TD
 <sub>The run conditions matter as much as the score: an emulated Moto G Power on throttled 4G, first page load, no warm cache. [Open this report](https://pagespeed.web.dev/analysis/https-ingilizceciyizmobil-com/jns9abevrm?form_factor=mobile) · [run a fresh one](https://pagespeed.web.dev/analysis?url=https://ingilizceciyizmobil.com/)</sub>
 
 Demand follows the school year rather than the calendar. September is consistently the peak — 2,041 downloads in September 2023, 1,632 in 2024, 1,940 in 2025 — while July and August drop to a fraction of that, because much of the paperwork these documents replace is concentrated around the start of term. Release planning is built around it: risky changes ship in spring, and the weeks before September are reserved for stability work, since that is when the largest group of new teachers opens the app for the first time.
+
+## What broke and what I changed
+
+**A row limit that fails silently.** The admin panel's template list showed 1,000 templates when the table held 1,002. Two yearly plans — third and fourth grade, restored from a backup and therefore carrying old timestamps — sat at rows 1,001 and 1,002 under a `created_at desc` sort and never reached the screen. A category count read 9 where the real number was 11. Mobile was unaffected, because its query filtered by `is_active` and category and stayed under the ceiling, which is why the fault went unseen for a while. The cause was PostgREST's `db_max_rows`, which Supabase defaults to 1,000: the limit is enforced server-side, so asking for `.range(0, 9999)` changes nothing. It also returns no error. The rows are simply not there.
+
+I raised the ceiling, first to 2,000 and later to 9,000, and that was the wrong fix. A higher ceiling does not remove the trap, it postpones it, and the failure mode stays the same: silent truncation with a successful response. The real change came later, when the device and document pages moved to RPCs that group, filter, search and paginate in the database. The trigger was not the ceiling but the absence of pagination — eleven hundred devices were being rendered on one screen. That same pass closed a query fetching every `downloads_log` row from the last 24 hours, which feeds the column a device ban is decided on. Losing rows there, without an error, would have been the worst version of this bug.
+
+**A decision I reversed the same day.** I chose Drizzle ORM for schema management, wrote the ADR, and replaced it with a second ADR hours later. The type-safe query builder was real value, but it arrived with `drizzle-kit`, a `DATABASE_URL`, a hook keeping `schema.ts` and `schema.sql` in sync, and four database scripts to maintain. Most of what that surface buys — migration ordering, drift detection, team synchronisation — protects against problems a single developer on a single project does not have. Meanwhile `supabase gen types` already produced a fully typed client. Both ADRs are still in the repository, the superseded one marked as such, because the reasoning is worth more than the conclusion.
