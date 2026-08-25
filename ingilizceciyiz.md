@@ -29,6 +29,22 @@ The output is a DOCX. Teachers still have to hand these documents to an administ
 
 **The schema is the single source of truth.** `packages/db/schema.sql` holds the tables with their row level security policies inline, and TypeScript types are generated from it. Migration files still exist but are explicitly demoted to historical reference, recorded as ADR-0012 rather than left as folklore. The schema, the access rules and the types cannot drift apart, because two of the three are derived from the first.
 
+```mermaid
+flowchart TD
+    S["packages/db/schema.sql<br/>single source of truth"]
+    R["row level security<br/>inline, in the same file"]
+    T["types.ts<br/>generated from the schema"]
+    M["apps/mobile — Expo"]
+    W["apps/web — Astro"]
+
+    S --> R
+    S --> T
+    T --> M
+    T --> W
+```
+
+<sub>One file to edit. The types are regenerated from it and the access rules sit beside the tables they protect, so none of the three can quietly fall out of step with the others.</sub>
+
 **Document generation runs off the client.** Supabase Edge Functions parse each plan type, resolve template variables, render the DOCX and hand back a signed URL. Generation is tracked as a job, so a slow render never blocks the app.
 
 ```mermaid
@@ -91,5 +107,9 @@ flowchart TD
 - **[PageSpeed Insights](https://pagespeed.web.dev/analysis?url=https://ingilizceciyizmobil.com/) 100 / 100 / 100 / 100 on mobile** — performance, accessibility, best practices and SEO, measured 26 August 2026, with LCP at 1.4 s, TBT at 0 ms and CLS at 0 on an emulated Moto G Power over throttled 4G
 - Paid subscriptions running on both platforms
 - Over 1,100 commits, still in active development
+
+![PageSpeed Insights — 100 across performance, accessibility, best practices and SEO](assets/ingilizceciyiz/pagespeed.webp)
+
+<sub>The run conditions matter as much as the score: an emulated Moto G Power on throttled 4G, first page load, no warm cache. [Open this report](https://pagespeed.web.dev/analysis/https-ingilizceciyizmobil-com/jns9abevrm?form_factor=mobile) · [run a fresh one](https://pagespeed.web.dev/analysis?url=https://ingilizceciyizmobil.com/)</sub>
 
 Demand follows the school year rather than the calendar. September is consistently the peak — 2,041 downloads in September 2023, 1,632 in 2024, 1,940 in 2025 — while July and August drop to a fraction of that, because much of the paperwork these documents replace is concentrated around the start of term. Release planning is built around it: risky changes ship in spring, and the weeks before September are reserved for stability work, since that is when the largest group of new teachers opens the app for the first time.
