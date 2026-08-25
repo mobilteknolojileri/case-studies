@@ -8,8 +8,8 @@ A digital assistant for English teachers in Turkey that automates the creation o
 
 | | |
 | :--- | :--- |
-| Role | Sole developer |
-| Timeline | September 2023 – present |
+| Role | Sole developer of the current platform |
+| Timeline | August 2025 – present · app in the stores since September 2023 |
 | Status | Live on the App Store and Google Play |
 | Links | [App Store](https://apps.apple.com/tr/app/ingilizceciyiz/id6459478322) · [Google Play](https://play.google.com/store/apps/details?id=com.ingilizceciyiz.ingilizceciyiz) · [ingilizceciyizmobil.com](https://ingilizceciyizmobil.com) |
 
@@ -20,6 +20,8 @@ Turkish teachers are required to file a large amount of paperwork every term. A 
 Two things make this expensive. The first is finding the correct, current template for each document. The second is that every one of those templates asks for the same information again: the teacher's name, the school, the principal, the department, the class, the academic dates. So the work is not writing — it is locating a file, opening it in Word, and retyping details that have not changed since the last document, once per document, once per class, every term.
 
 ## What I built
+
+**Rebuilt from scratch.** The app had been in the stores since 2023 when I took it over in August 2025. Everything below is the platform I wrote to replace it; the rebuild shipped in April 2026 and has been the live product since.
 
 **Fill it in once, reuse it everywhere.** The core of the data model is a `variables` table whose every entry belongs to one of four namespaces: `profile`, `class`, `date` or `custom`. Profile variables come from the teacher's account, class variables from the class they picked, date variables from the academic calendar, and only genuinely one-off values are typed by hand. A companion table binds each document template to the variables it needs, marking which are required and in what order — so the form a teacher sees is generated from the template itself, already filled with everything the system knows.
 
@@ -70,6 +72,8 @@ flowchart TD
 
 **CI enforces what review would otherwise have to catch.** GitHub Actions runs lint, typecheck and build, deploys edge functions, and runs `gitleaks` for secret scanning alongside a dependency audit. A Husky pre-push hook applies the same rules locally through Turborepo, so failures arrive before the push rather than after it.
 
+**Backups are a feature, not a runbook step.** A dedicated edge function exports the full database, and the admin panel downloads it in one click. Whatever the hosting platform provides by default is a floor, not a plan.
+
 **Delivery is deliberately boring.** Web deploys to Cloudflare Pages on push to `main`. Mobile builds through EAS, and JavaScript-only fixes ship as over-the-air updates without waiting for store review — which matters when a teacher hits a bug during a lesson.
 
 **Performance is a budget, not a hope.** The home page scored 94 on Lighthouse performance one week and 72 the next, and six days passed before anyone noticed — a hero animation, a React theme island and analytics loading too early. So I wrote a measurement command: it runs Lighthouse under a mobile preset on throttled 4G, applies a resource and timing budget, takes the median of several runs and exits non-zero if any category falls below its threshold. I keep it out of CI on purpose and run it whenever the three files behind that regression are touched, so the check stays a decision rather than an automatic gate. In the most recent measured run, on 26 August 2026, the live site scored 100 in all four PageSpeed Insights categories on mobile.
@@ -100,10 +104,11 @@ flowchart TD
 
 ## Outcome
 
+- **11,277 documents generated** by **1,134 teachers** as of 26 August 2026 — roughly ten each
+- **1,069 document templates** across eight categories — the catalogue tracks the syllabus, and 444 daily plans were retired in 2026 after a curriculum update
 - **23,000+ downloads** — 13,594 on the App Store, 10,000+ on Google Play
-- **In production since September 2023**, across three back-to-school cycles
+- **In the stores since September 2023**, across three back-to-school cycles; the rebuilt platform shipped in April 2026
 - **[PageSpeed Insights](https://pagespeed.web.dev/analysis?url=https://ingilizceciyizmobil.com/) 100 / 100 / 100 / 100 on mobile** — performance, accessibility, best practices and SEO, measured 26 August 2026, with LCP at 1.4 s, TBT at 0 ms and CLS at 0 on an emulated Moto G Power over throttled 4G
-- Paid subscriptions running on both platforms
 - Over 1,100 commits, still in active development
 
 ![PageSpeed Insights — 100 across performance, accessibility, best practices and SEO](assets/ingilizceciyiz/pagespeed.webp)
