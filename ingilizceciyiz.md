@@ -33,9 +33,9 @@ The output is a DOCX. Teachers still have to hand these documents to an administ
 
 ```mermaid
 flowchart TD
-    S["packages/db/schema.sql<br/>single source of truth"]
-    R["row level security<br/>inline, in the same file"]
-    T["types.ts<br/>generated from the schema"]
+    S["packages/db/schema.sql<br/>single source"]
+    R["row level security<br/>inline"]
+    T["types.ts<br/>generated"]
     M["apps/mobile — Expo"]
     W["apps/web — Astro"]
 
@@ -51,9 +51,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    P["profile<br/>name · school · principal"]
-    C["class<br/>grade · branch"]
-    D["date<br/>academic calendar"]
+    A["stored once per teacher<br/>profile · class · date"]
     T["template<br/>declares its variables"]
 
     F["generated form<br/>known values pre-filled"]
@@ -61,14 +59,12 @@ flowchart TD
     E["edge function<br/>resolve · render"]
     O["DOCX<br/>editable in Word"]
 
-    P --> F
-    C --> F
-    D --> F
+    A --> F
     T --> F
     F --> J --> E --> O
 ```
 
-<sub>The three namespaces at the top are stored once per teacher. Everything below them is derived, which is why producing the next document requires almost no repeated data entry.</sub>
+<sub>The top row is stored once and reused by every template. Everything below the form is derived, which is why producing the next document requires almost no repeated data entry.</sub>
 
 **CI enforces what review would otherwise have to catch.** GitHub Actions runs lint, typecheck and build, deploys edge functions, and runs `gitleaks` for secret scanning alongside a dependency audit. A Husky pre-push hook applies the same rules locally through Turborepo, so failures arrive before the push rather than after it.
 
