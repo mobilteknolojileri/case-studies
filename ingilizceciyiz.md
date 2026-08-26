@@ -38,11 +38,17 @@ flowchart TD
     T["types.ts<br/>generated"]
     M["apps/mobile — Expo"]
     W["apps/web — Astro"]
+    SP[" "]
+    SQ[" "]
 
     S --> R
     S --> T
     T --> M
     T --> W
+    W ~~~ SP
+    SP ~~~ SQ
+    classDef spacer fill:none,stroke:none
+    class SP,SQ spacer
 ```
 
 <sub>One file to edit. The types are regenerated from it and the access rules sit beside the tables they protect, so none of the three can quietly fall out of step with the others.</sub>
@@ -51,6 +57,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
+    SP[" "]
     A["stored once per teacher<br/>profile · class · date"]
     T["template<br/>declares its variables"]
 
@@ -59,9 +66,13 @@ flowchart TD
     E["edge function<br/>resolve · render"]
     O["DOCX<br/>editable in Word"]
 
+    SP ~~~ A
+    SP ~~~ T
     A --> F
     T --> F
     F --> J --> E --> O
+    classDef spacer fill:none,stroke:none
+    class SP spacer
 ```
 
 <sub>The top row is stored once and reused by every template. Everything below the form is derived, which is why producing the next document requires almost no repeated data entry.</sub>
