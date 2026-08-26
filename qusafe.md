@@ -101,13 +101,13 @@ flowchart TD
 
 ## Outcome
 
-- **Live on Google Play since 26 January 2026**, at version 1.4.0 — [`com.schwerttr.qusafe`](https://play.google.com/store/apps/details?id=com.schwerttr.qusafe), **100+ downloads**, verified 26 August 2026
-- **42 encrypted vaults** in `vault_sync`, the first written 27 January 2026 — the day after release — and the most recent updated **25 August 2026**, seven months after the last commit
+- **Live on Google Play since 20 January 2026**, updated to 1.4.0 on 26 January — [`com.schwerttr.qusafe`](https://play.google.com/store/apps/details?id=com.schwerttr.qusafe), **100+ downloads**, Android 7.0 and up, verified 26 August 2026
+- **42 encrypted vaults** in `vault_sync`, the first written 27 January 2026 — the day after that last update — and the most recent updated **25 August 2026**, seven months after the last commit
 - **636 commits in 49 days**, 10 December 2025 to 27 January 2026, ending at 1.4.0
 - **Ten languages shipped**, including one right-to-left locale
 - Not on the App Store. The reasons are the Apple developer cost and my own judgement that the app is not ready for it — I would rather finish the modules that are still empty tiles first
 
-The number that matters here is not the download count. It is that a vault written the day after release was still being updated in August, on an app that has not received a commit since January. No fix shipped in that period, which is evidence that the core path — derive, decrypt, sync — kept working without maintenance. It is not evidence that everything else is correct; the open finding at the end of this page is proof of that.
+The number that matters here is not the download count. It is that a vault written in January was still being updated in August, on an app that has not received a commit since January. No fix shipped in that period, which is evidence that the core path — derive, decrypt, sync — kept working without maintenance. It is not evidence that everything else is correct; the open finding at the end of this page is proof of that.
 
 ## What broke and what I changed
 
