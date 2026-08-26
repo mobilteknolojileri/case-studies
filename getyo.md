@@ -32,16 +32,20 @@ flowchart TD
     V["visitor"]
     S["frozenyogurtcafe.com<br/>Astro, static"]
     N["admin app<br/>/api/public/menu"]
-    D["Supabase<br/>flavors and toppings"]
+    D["Supabase"]
     M["mobile app"]
+    SP[" "]
 
     V --> S
     S -->|"/api/* rewrite"| N
     N --> D
     M --> D
+    D ~~~ SP
+    classDef spacer fill:none,stroke:none
+    class SP spacer
 ```
 
-<sub>The rewrite is the whole trick: the browser asks the static site, the static site's host asks the admin app. No build step has to run when a flavor sells out.</sub>
+<sub>The rewrite is the whole trick: the browser asks the static site, the static site's host asks the admin app, and both it and the phone read the same flavor and topping tables. No build step has to run when a flavor sells out.</sub>
 
 **The loyalty API never reaches the phone.** RewardUp authenticates with a bearer token. A token shipped inside a mobile binary is a token anyone can extract, and it is the token that reads and writes customer point balances. So the app does not have it. Twelve of the mobile project's thirteen edge functions are single-purpose proxies — `rewardup-get-member`, `rewardup-add-points`, `rewardup-redeem-reward`, `rewardup-get-stamps` and the rest — each one accepting a call from a signed-in user, attaching the token server-side and returning only what that user is allowed to see. The token exists in Supabase's function environment and nowhere else.
 
@@ -50,14 +54,18 @@ flowchart TD
     A["mobile app"]
     B["12 rewardup-* functions<br/>bearer token stays here"]
     C["RewardUp<br/>loyalty API"]
-    D["Supabase<br/>menu, votes, feedback"]
+    D["Supabase"]
+    SP[" "]
 
     A --> B
     B --> C
     A --> D
+    C ~~~ SP
+    classDef spacer fill:none,stroke:none
+    class SP spacer
 ```
 
-<sub>Twelve functions instead of one generic pass-through, on purpose: a proxy that forwards an arbitrary path is the same security hole as shipping the token, one indirection later.</sub>
+<sub>Twelve functions instead of one generic pass-through, on purpose: a proxy that forwards an arbitrary path is the same security hole as shipping the token, one indirection later. Everything that is not loyalty — menu, votes, feedback — the app reads from Supabase itself.</sub>
 
 **Notifications are opt-in per category, not per app.** Each customer's profile stores separate preferences for new flavors, favorites coming back in stock, promotions and voting results. When staff save a flavor with the alert toggle on, the admin API selects only the push tokens whose owners asked for that category, and hands them to an edge function that talks to the Expo Push API. A customer who wants to know when their favorite returns does not also get promotional messages.
 
@@ -68,8 +76,12 @@ flowchart TD
     EF["send-push-notification"]
     EX["Expo Push API"]
     PH["subscribed phones"]
+    SP[" "]
 
     AD --> API --> EF --> EX --> PH
+    PH ~~~ SP
+    classDef spacer fill:none,stroke:none
+    class SP spacer
 ```
 
 <sub>The filter runs before the send, not on the device. A phone that never asked for promotions is never in the list.</sub>
