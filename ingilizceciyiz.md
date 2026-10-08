@@ -111,7 +111,8 @@ flowchart TD
 
 ## Outcome
 
-- **11,277 documents generated** by **1,134 teachers** as of 26 August 2026 — roughly ten each
+- **28,963 documents generated** by **3,416 teachers** as of 9 October 2026 — about eight and a half each
+- **6,679 teacher accounts** on the same date
 - **1,069 document templates** built across eight categories
 - **23,000+ downloads** — 13,594 on the App Store, 10,000+ on Google Play
 - **In the stores since September 2023**, across three back-to-school cycles; the rebuilt platform shipped in April 2026
