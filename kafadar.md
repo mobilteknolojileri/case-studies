@@ -76,7 +76,7 @@ flowchart TD
 
 ## What broke and what I changed
 
-**The reward and the result screen raced each other.** At the end of a quiz the app showed an interstitial and then moved to the score screen. On some devices it crashed with `Couldn't find a navigation context`. The cause was that `showQuizFinishInterstitial()` awaited the ad's `show()` call but not the ad's dismissal, so `setStep('score')` could fire while the ad overlay was still mounted, and the state transition and the ad teardown competed for the same navigation tree.
+**The ad and the result screen raced each other.** At the end of a quiz the app showed an interstitial and then moved to the score screen. On some devices it crashed with `Couldn't find a navigation context`. The cause was that `showQuizFinishInterstitial()` awaited the ad's `show()` call but not the ad's dismissal, so `setStep('score')` could fire while the ad overlay was still mounted, and the state transition and the ad teardown competed for the same navigation tree.
 
 The fix was to make the function wait for the thing it actually cared about: `AdEventType.CLOSED` or `AdEventType.ERROR`, with a twenty-second timeout so a failed ad cannot strand the user on a finished quiz forever, and guaranteed listener cleanup so a second quiz does not inherit the first one's handlers. On the screen side an `isMountedRef` guards the score update. Awaiting `show()` looked like awaiting the ad. It was awaiting the request to display one.
 
