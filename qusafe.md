@@ -82,7 +82,7 @@ flowchart TD
 
 **Free, with ads, and a Pro tier.** Rewarded video buys bonus entries above the free limit; interstitials are frequency-capped at one per three minutes in code. Subscriptions go through RevenueCat, and its webhook is the only thing that writes premium status. This matters to the engineering because the ad SDK and the lock behaviour ended up fighting each other — see below.
 
-**Translated into ten languages, offered in fifty-nine.** `languages.ts` lists 59 languages; `locales/` holds ten JSON files: Arabic, German, English, Spanish, French, Hebrew, Italian, Portuguese, Russian and Turkish. Rather than hide the gap, `supportedLngs` is derived from the files that actually exist and the picker splits the list into active and coming soon. Hebrew is the reason the app has right-to-left support at all, and the reason for the crash in the next section.
+**Translated into ten languages, offered in fifty-nine.** `languages.ts` lists 59 languages; `locales/` holds ten JSON files: Arabic, German, English, Spanish, French, Hebrew, Italian, Portuguese, Russian and Turkish. Rather than hide the gap, `supportedLngs` is derived from the files that actually exist and the picker splits the list into active and coming soon. Arabic and Hebrew are the reason the app has right-to-left support at all, and that support is where the crash in the next section came from.
 
 ## Stack
 
@@ -104,14 +104,14 @@ flowchart TD
 - **Live on Google Play since 20 January 2026**, updated to 1.4.0 on 26 January — [`com.schwerttr.qusafe`](https://play.google.com/store/apps/details?id=com.schwerttr.qusafe), **100+ downloads**, Android 7.0 and up, verified 26 August 2026
 - **42 encrypted vaults** in `vault_sync`, the first written 27 January 2026 — the day after that last update — and the most recent updated **25 August 2026**, seven months after the last commit
 - **636 commits in 49 days**, 10 December 2025 to 27 January 2026, ending at 1.4.0
-- **Ten languages shipped**, including one right-to-left locale
+- **Ten languages shipped**, two of them right to left: Arabic and Hebrew
 - Not on the App Store. The reasons are the Apple developer cost and my own judgement that the app is not ready for it — I would rather finish the modules that are still empty tiles first
 
 The number that matters here is not the download count. It is that a vault written in January was still being updated in August, on an app that has not received a commit since January. No fix shipped in that period, which is evidence that the core path — derive, decrypt, sync — kept working without maintenance. It is not evidence that everything else is correct; the open finding at the end of this page is proof of that.
 
 ## What broke and what I changed
 
-**Switching to Hebrew crashed the app on a real device.** Sentry `2082b1d3`: `SIGSEGV`, inside `margelo::nitro::CommonGlobals::Object::defineProperty`, on a Xiaomi 2407FPN8EG running Android 15, in release 1.2.0. The chain was short and entirely self-inflicted: tapping a right-to-left language called `I18nManager.forceRTL(true)`, which immediately triggered a reload so the layout could flip, and the reload reinitialised the Nitro Modules native layer while the JSI runtime was still being torn down. A native module was calling `defineProperty` on a runtime that no longer existed.
+**Switching to a right-to-left language crashed the app on a real device.** Sentry `2082b1d3`: `SIGSEGV`, inside `margelo::nitro::CommonGlobals::Object::defineProperty`, on a Xiaomi 2407FPN8EG running Android 15, in release 1.2.0. The chain was short and entirely self-inflicted: tapping a right-to-left language called `I18nManager.forceRTL(true)`, which immediately triggered a reload so the layout could flip, and the reload reinitialised the Nitro Modules native layer while the JSI runtime was still being torn down. A native module was calling `defineProperty` on a runtime that no longer existed.
 
 My first list of options included delaying the reload by 300 ms, clearing state before it, and — marked as the safest — simply telling the user to close and reopen the app themselves. What I shipped was neither the naive delay alone nor the surrender. The language setter no longer reloads at all; it sets the RTL flag, returns a boolean saying a reload is needed, and stops. The comment in `src/i18n/index.ts` is the fix in one line: `Do NOT reload here - let caller handle with confirmation modal`. Reloading became a separate function that the caller invokes after the user has confirmed, and that function starts by awaiting 300 ms so the native side has a window to finish cleanup. The delay was necessary but it was never sufficient — moving the decision out of the setter is what removed the race.
 
