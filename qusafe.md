@@ -82,7 +82,7 @@ flowchart TD
 
 **Free, with ads, and a Pro tier.** Rewarded video buys bonus entries above the free limit; interstitials are frequency-capped at one per three minutes in code. Subscriptions go through RevenueCat, and its webhook is the only thing that writes premium status. This matters to the engineering because the ad SDK and the lock behaviour ended up fighting each other — see below.
 
-**Translated into ten languages, offered in fifty-nine.** `languages.ts` lists 59 languages; `locales/` holds ten JSON files: Arabic, German, English, Spanish, French, Hebrew, Italian, Portuguese, Russian and Turkish. Rather than hide the gap, `supportedLngs` is derived from the files that actually exist and the picker splits the list into active and coming soon. Arabic and Hebrew are the reason the app has right-to-left support at all, and that support is where the crash in the next section came from.
+**Translated into ten languages, offered in fifty-nine.** `languages.ts` lists 59 languages; `locales/` holds ten JSON files: Arabic, German, English, Spanish, French, Hebrew, Italian, Portuguese, Russian and Turkish. Rather than hide the gap, `supportedLngs` is derived from the files that actually exist and the picker splits the list into active and coming soon. Arabic and Hebrew are the reason the app has right-to-left support at all, and that support is where the crash described below came from.
 
 ## Stack
 
