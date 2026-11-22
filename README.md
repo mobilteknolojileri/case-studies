@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/mobilteknolojileri"><img alt="Profile" src="https://img.shields.io/badge/profile-mobilteknolojileri-1a1a2e?style=for-the-badge&labelColor=1a1a2e&logo=github" /></a>&nbsp;
-  <a href="https://goldsword.dev"><img alt="Portfolio" src="https://img.shields.io/badge/goldsword.dev-portfolio-1a1a2e?style=for-the-badge&labelColor=1a1a2e&logo=astro&logoColor=BC52EE" /></a>
+  <a href="https://mobilteknolojileri.com"><img alt="Portfolio" src="https://img.shields.io/badge/mobilteknolojileri.com-portfolio-1a1a2e?style=for-the-badge&labelColor=1a1a2e&logo=astro&logoColor=BC52EE" /></a>
 </p>
 
 ---
